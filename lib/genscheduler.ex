@@ -16,8 +16,8 @@ defmodule GenScheduler do
   
   def start_link(module_name, args) do
     {:ok, stash_pid} = Agent.start(fn ->{} end)
-  config = %SchedulerConfig{ stash: stash_pid, module_name: module_name }
-  Agent.update(stash_pid, fn _ -> config end)
+    config = %SchedulerConfig{ stash: stash_pid, module_name: module_name }
+    Agent.update(stash_pid, fn _ -> config end)
     GenServer.start_link(__MODULE__, {stash_pid, args})
   end
   
@@ -29,9 +29,9 @@ defmodule GenScheduler do
     {:ok, scheduler_init_state} = sched_config.module_name.init(args)
     init_config = sched_config.module_name.initial_configuration
     config = init_config
-        |> Map.put(:scheduler_state, scheduler_init_state)
-        |> Map.put(:stash, sched_config.stash)
-        |> Map.put(:module_name, sched_config.module_name)
+      |> Map.put(:scheduler_state, scheduler_init_state)
+      |> Map.put(:stash, sched_config.stash)
+      |> Map.put(:module_name, sched_config.module_name)
     
     {:ok, config}
   end
@@ -46,7 +46,7 @@ defmodule GenScheduler do
   end
   
   defmacro __using__([interval: interval]) do 
-  setup(%SchedulerConfig{interval: interval})
+    setup(%SchedulerConfig{interval: interval})
   end
   defmacro __using__([interval: interval, max_runs: max_runs]) do
     setup(%SchedulerConfig{interval: interval,max_runs: max_runs})
@@ -79,13 +79,13 @@ defmodule GenScheduler do
   end
   
   def execute(pid), do: GenServer.cast(pid, :execute)
-  def handle_cast(:execute, %SchedulerConfig{max_runs: mr, nth_run: nthr, status: :enabled } = config) when mr = :infinity or mr > nthr do
+  def handle_cast(:execute, %SchedulerConfig{max_runs: mr, nth_run: nthr, status: :enabled } = config) when mr == :infinity or mr > nthr do
     new_config = config
     |> run #execute scheduled function
     |> sleep #sleep interval
      
     #update state
-    |> Map.put(:nth_run, new_config.nth_run + 1)
+    |> Map.put(:nth_run, config.nth_run + 1)
 	
 	#send loop message
     execute(self)
@@ -93,7 +93,7 @@ defmodule GenScheduler do
 	{:noreply, new_config}
   end
   
-  def handle_cast(:execute, %SchedulerConfig{max_runs: mr, nth_run: nthr, status: :disabled } = config) when mr = :infinity or mr > nthr do
+  def handle_cast(:execute, %SchedulerConfig{max_runs: mr, nth_run: nthr, status: :disabled } = config) when mr == :infinity or mr > nthr do
     #sleep temp interval
     sleep(5000)
 	
