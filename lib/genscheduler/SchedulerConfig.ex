@@ -1,5 +1,5 @@
 defmodule SchedulerConfig do
 
-  defstruct interval: 5000, max_runs: :infinity, nth_run: 0, start_time: :erlang.time, status: :enabled, async: false, stash: nil, module_name: nil, scheduler_state: nil
+  defstruct interval: 5000, max_runs: :infinity, nth_run: 0, start_time: :erlang.time, status: :enabled, async: false, stash: nil, module_name: nil, scheduler_state: nil, last_result: nil, stop_reason: nil
   
 end
